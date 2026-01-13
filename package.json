@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon src/index.js",
     "dev": "nodemon src/index.js",
-    "build": "node src/index.js",
+    "build": "echo 'No build step required'",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write .",

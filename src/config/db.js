@@ -7,7 +7,7 @@ dotenv.config();
 const connectDB = async () => {
     try {
         console.log('🔍 Checking MONGO_URI:', process.env.MONGO_URI ? 'Found' : 'Not found');
-        
+
         if (!process.env.MONGO_URI) {
             throw new Error('MONGO_URI environment variable is not set');
         }
@@ -36,16 +36,9 @@ const connectDB = async () => {
             console.log('⚠️ Database disconnected');
         });
 
-        // Graceful shutdown
-        process.on('SIGINT', async () => {
-            await connection.close();
-            console.log('Database connection closed through app termination');
-            process.exit(0);
-        });
-
     } catch (error) {
         console.log('❌ Error connecting database:', error.message);
-        process.exit(1);
+        throw error;
     }
 };
 
