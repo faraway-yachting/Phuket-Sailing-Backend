@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
 // Load environment variables
 dotenv.config();
@@ -7,10 +7,15 @@ dotenv.config();
 const connectDB = async () => {
     try {
         console.log('🔍 Checking MONGO_URI:', process.env.MONGO_URI ? 'Found' : 'Not found');
-        
+
         if (!process.env.MONGO_URI) {
             throw new Error('MONGO_URI environment variable is not set');
         }
+
+        const dbName = process.env.MONGO_URI.split('/').pop().split('?')[0];
+        const env = process.env.NODE_ENV || 'development';
+        console.log(`🌍 Environment: ${env}`);
+        console.log(`📦 Database: ${dbName}`);
 
         // Connection options for better performance
         const options = {
@@ -23,9 +28,12 @@ const connectDB = async () => {
 
         const { connection } = await mongoose.connect(process.env.MONGO_URI, options);
 
-        // Set up connection event listeners
+        if (connection.readyState === 1) {
+            console.log('✅ Database connected successfully');
+        }
+
         connection.on('connected', () => {
-        console.log('✅ Database connected successfully');
+            console.log('✅ Database connected successfully');
         });
 
         connection.on('error', (err) => {

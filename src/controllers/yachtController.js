@@ -134,7 +134,7 @@ export const getAllYachts = async (req, res, next) => {
       return next(new ApiError(error.details[0].message, 400));
     }
 
-    const { page = 1, limit = 10, status } = req.query;
+    const { page = 1, limit = 10, status, search } = req.query;
     const { skip, limit: parsedLimit } = paginate(page, limit);
 
     // Build query filter
@@ -142,13 +142,16 @@ export const getAllYachts = async (req, res, next) => {
     if (status && ['draft', 'published'].includes(status)) {
       filter.status = status;
     }
+    if (search) {
+      filter.title = { $regex: search, $options: 'i' };
+    }
 
 
 
     // Use Promise.all for parallel execution
     const [yachts, total, recentlyUpdated] = await Promise.all([
       Yacht.find(filter)
-        .sort({ updatedAt: -1, createdAt: -1 })
+        .sort({ order: 1, updatedAt: -1, createdAt: -1 })
         .skip(skip)
         .limit(parsedLimit)
         .lean()

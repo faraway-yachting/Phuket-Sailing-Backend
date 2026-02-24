@@ -110,6 +110,7 @@ const addyachtSchema = Joi.object({
   waterCapacity: Joi.string().allow('').optional(),
   code: Joi.string().allow('').optional(),
   tags: Joi.array().items(Joi.string()).optional(),
+  order: Joi.number().integer().min(0).optional(),
   slug: Joi.string().allow('').optional(),
 });
 
@@ -119,7 +120,8 @@ const getAllYachtsSchema = Joi.object({
   limit: Joi.number().integer().min(1).max(100).optional(),
   status: Joi.string().valid('draft', 'published').optional().messages({
     'any.only': 'Status must be either draft or published'
-  })
+  }),
+  search: Joi.string().allow('').optional()
 });
 
 // For getYachtById, require 'id' as a string (in query or params)
