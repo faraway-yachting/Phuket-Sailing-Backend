@@ -3,6 +3,7 @@ dotenv.config();
 
 import cors from 'cors';
 import express from 'express';
+import mongoose from 'mongoose';
 import path from 'path';
 
 import cookieParser from 'cookie-parser';
@@ -48,11 +49,23 @@ const startServer = async () => {
 
         // Health check
         app.get('/health', (req, res) => {
-            res.json({
-                message: 'OK',
+            const dbState = mongoose.connection.readyState;
+            const dbStatus = ['disconnected', 'connected', 'connecting', 'disconnecting'][dbState] || 'unknown';
+            const isHealthy = dbState === 1;
+            res.status(isHealthy ? 200 : 503).json({
+                status: isHealthy ? 'OK' : 'DEGRADED',
+                db: dbStatus,
                 timestamp: new Date().toISOString(),
                 uptime: process.uptime()
             });
+        });
+
+        // Return 503 when DB is not ready instead of hanging
+        app.use((req, res, next) => {
+            if (mongoose.connection.readyState !== 1) {
+                return res.status(503).json({ message: 'Service temporarily unavailable. Please try again shortly.' });
+            }
+            next();
         });
 
         // Routes

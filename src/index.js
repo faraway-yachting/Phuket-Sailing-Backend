@@ -14,8 +14,9 @@ const server = http.createServer(app);
 // Serve uploads folder at /uploads
 app.use('/uploads', express.static(path.join(process.cwd(), 'src/uploads')));
 
-connectDB().then(() => {
-    server.listen(PORT, () => {
-        console.log(`Phuket Sailing is running on port ${PORT}`);
-    });
+// Start server immediately — DB connects in background with auto-retry
+server.listen(PORT, () => {
+    console.log(`Phuket Sailing is running on port ${PORT}`);
 });
+
+connectDB();
